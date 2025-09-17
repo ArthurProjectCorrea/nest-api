@@ -2,16 +2,15 @@ name: Manual Release
 
 on:
   workflow_dispatch:
-    inputs:
-      release:
-        description: 'Trigger a manual release'
-        required: true
-        default: 'true'
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -26,13 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Set up git credentials
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/ArthurProjectCorrea/nest-api.git
-
       - name: Run Semantic Release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
